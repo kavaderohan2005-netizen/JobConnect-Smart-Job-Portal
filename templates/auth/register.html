@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account – JobConnect Smart Job Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7 col-md-9">
+
+      <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="brand-icon mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.3rem;">
+            <i class="fa-solid fa-user-plus"></i>
+          </div>
+          <h3 class="fw-bold text-dark">Create Your Account</h3>
+          <p class="text-muted small">Join India's premier tech talent community and fast-track your hiring</p>
+        </div>
+
+        <!-- Role Selector Nav Tabs -->
+        <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-3 border" id="roleTabs">
+          <li class="nav-item">
+            <button class="nav-link fw-bold {% if role != 'employer' %}active{% endif %}" id="seeker-tab" type="button" onclick="selectRole('job_seeker')">
+              <i class="fa-solid fa-user-graduate me-2"></i> I am a Job Seeker
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link fw-bold {% if role == 'employer' %}active{% endif %}" id="employer-tab" type="button" onclick="selectRole('employer')">
+              <i class="fa-solid fa-briefcase me-2"></i> I am an Employer
+            </button>
+          </li>
+        </ul>
+
+        <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm">
+          <input type="hidden" name="role" id="roleInput" value="{{ role or 'job_seeker' }}">
+
+          <div class="row g-3">
+            <!-- Full Name -->
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-dark">Full Name <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="fa-regular fa-user"></i></span>
+                <input type="text" name="full_name" class="form-control bg-light" placeholder="e.g. Vikramaditya Rao" required>
+              </div>
+            </div>
+
+            <!-- Username -->
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-dark">Username <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-at"></i></span>
+                <input type="text" name="username" class="form-control bg-light" placeholder="e.g. vikram_dev" required>
+              </div>
+            </div>
+
+            <!-- Email Address -->
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-dark">Email Address <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="fa-regular fa-envelope"></i></span>
+                <input type="email" name="email" class="form-control bg-light" placeholder="name@domain.com" required>
+              </div>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-dark">Contact Phone</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-phone"></i></span>
+                <input type="tel" name="phone" class="form-control bg-light" placeholder="+91 98765 43210">
+              </div>
+            </div>
+
+            <!-- Job Seeker Specific Fields -->
+            <div id="seekerFields" class="{% if role == 'employer' %}d-none{% endif %} col-12">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-dark">Professional Headline</label>
+                  <input type="text" name="headline" class="form-control bg-light" placeholder="e.g. Senior Machine Learning Engineer | PyTorch & AWS">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-dark">Current City</label>
+                  <input type="text" name="location" class="form-control bg-light" placeholder="e.g. Bengaluru, Karnataka">
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold text-dark">Key Skills (comma-separated)</label>
+                  <input type="text" name="skills" class="form-control bg-light" placeholder="Python, SQL, FastApi, Machine Learning, Docker">
+                </div>
+              </div>
+            </div>
+
+            <!-- Employer Specific Fields -->
+            <div id="employerFields" class="{% if role != 'employer' %}d-none{% endif %} col-12">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-dark">Company / Organization Name <span class="text-danger">*</span></label>
+                  <input type="text" name="company_name" class="form-control bg-light" placeholder="e.g. Zepto or Pine Labs">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-dark">Your Designation</label>
+                  <input type="text" name="designation" class="form-control bg-light" placeholder="e.g. Lead Tech Recruiter / HRBP">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-dark">Company Location</label>
+                  <input type="text" name="company_location" class="form-control bg-light" placeholder="e.g. Bengaluru, India">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-dark">Industry Sector</label>
+                  <input type="text" name="industry" class="form-control bg-light" placeholder="e.g. FinTech / SaaS">
+                </div>
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-dark">Password <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-lock"></i></span>
+                <input type="password" name="password" class="form-control bg-light" placeholder="Min 6 characters" required>
+              </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-dark">Confirm Password <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted"><i class="fa-solid fa-lock-open"></i></span>
+                <input type="password" name="confirm_password" class="form-control bg-light" placeholder="Re-enter password" required>
+              </div>
+            </div>
+
+            <!-- Terms -->
+            <div class="col-12 mt-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="termsCheck" required checked>
+                <label class="form-check-label small text-muted" for="termsCheck">
+                  I agree to the <a href="{{ url_for('main.about') }}" class="text-primary">Terms of Service</a> and <a href="{{ url_for('main.about') }}" class="text-primary">Privacy Policy</a>.
+                </label>
+              </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">
+                Create My JobConnect Account <i class="fa-solid fa-arrow-right ms-2"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div class="text-center mt-4">
+          <span class="small text-muted">Already registered on JobConnect?</span>
+          <a href="{{ url_for('auth.login') }}" class="small fw-bold text-primary ms-1">Sign in here</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function selectRole(role) {
+  document.getElementById('roleInput').value = role;
+  const seekerTab = document.getElementById('seeker-tab');
+  const employerTab = document.getElementById('employer-tab');
+  const seekerFields = document.getElementById('seekerFields');
+  const employerFields = document.getElementById('employerFields');
+
+  if (role === 'job_seeker') {
+    seekerTab.classList.add('active');
+    employerTab.classList.remove('active');
+    seekerFields.classList.remove('d-none');
+    employerFields.classList.add('d-none');
+  } else {
+    employerTab.classList.add('active');
+    seekerTab.classList.remove('active');
+    employerFields.classList.remove('d-none');
+    seekerFields.classList.add('d-none');
+  }
+}
+</script>
+{% endblock %}

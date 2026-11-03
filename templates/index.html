@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+
+{% block title %}JobConnect – Smart Job Portal | Find Your Dream Tech Job in India{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container position-relative">
+    <div class="row align-items-center">
+      <div class="col-lg-8 mx-auto text-center">
+        <div class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill mb-3 fw-semibold">
+          <i class="fa-solid fa-sparkles me-1 text-warning"></i> #1 Smart Recruitment Platform for Indian Tech Talent
+        </div>
+        <h1 class="hero-title">
+          Find Your Dream Tech Job with <span>Smart Matching</span>
+        </h1>
+        <p class="hero-subtitle mx-auto">
+          Explore thousands of verified openings in Data Science, AI, Backend, Analytics, and Cloud across India's premier enterprises and high-growth startups.
+        </p>
+
+        <!-- Advanced Search Form -->
+        <div class="hero-search-card text-start mb-4">
+          <form action="{{ url_for('main.search') }}" method="GET" class="row g-2 align-items-center">
+            <!-- Keyword / Skill -->
+            <div class="col-md-5">
+              <div class="search-input-group">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" name="q" class="search-input-field" placeholder="Job title, skills (e.g. Python, Data Scientist)">
+              </div>
+            </div>
+
+            <!-- Location -->
+            <div class="col-md-4">
+              <div class="search-input-group">
+                <i class="fa-solid fa-location-dot search-icon"></i>
+                <input type="text" name="location" class="search-input-field" placeholder="Location (e.g. Bengaluru, Pune, Remote)">
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="col-md-3">
+              <button type="submit" class="btn btn-primary w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2">
+                <i class="fa-solid fa-magnifying-glass"></i> Search Jobs
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Popular Tags -->
+        <div class="d-flex align-items-center justify-content-center flex-wrap gap-2 text-white-50 small">
+          <span>Trending Searches:</span>
+          <a href="{{ url_for('main.search', q='Data Scientist') }}" class="badge bg-white bg-opacity-10 text-white text-decoration-none px-2 py-1">Data Scientist</a>
+          <a href="{{ url_for('main.search', q='Python Developer') }}" class="badge bg-white bg-opacity-10 text-white text-decoration-none px-2 py-1">Python Developer</a>
+          <a href="{{ url_for('main.search', q='Machine Learning') }}" class="badge bg-white bg-opacity-10 text-white text-decoration-none px-2 py-1">Machine Learning</a>
+          <a href="{{ url_for('main.search', q='Power BI') }}" class="badge bg-white bg-opacity-10 text-white text-decoration-none px-2 py-1">Power BI</a>
+          <a href="{{ url_for('main.search', location='Bengaluru') }}" class="badge bg-white bg-opacity-10 text-white text-decoration-none px-2 py-1">Bengaluru</a>
+          <a href="{{ url_for('main.search', work_mode='Remote') }}" class="badge bg-white bg-opacity-10 text-white text-decoration-none px-2 py-1">Remote</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Counter Metric Badges -->
+    <div class="row mt-5 g-3 justify-content-center">
+      <div class="col-6 col-md-3">
+        <div class="kpi-card text-center py-3">
+          <div class="kpi-val text-primary">{{ total_jobs }}+</div>
+          <div class="kpi-label">Active Job Openings</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="kpi-card text-center py-3">
+          <div class="kpi-val text-success">{{ total_companies }}+</div>
+          <div class="kpi-label">Hiring Companies</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="kpi-card text-center py-3">
+          <div class="kpi-val text-info">{{ total_candidates }}+</div>
+          <div class="kpi-label">Verified Techies</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="kpi-card text-center py-3">
+          <div class="kpi-val text-purple">{{ total_applications }}+</div>
+          <div class="kpi-label">Applications Placed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="text-primary fw-bold text-uppercase small letter-spacing-1">Explore Pathways</span>
+        <h2 class="fw-bold text-dark mb-0">Browse by Tech Category</h2>
+      </div>
+      <a href="{{ url_for('main.search') }}" class="btn btn-outline-primary btn-sm">
+        View All Categories <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for cat in categories %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <a href="{{ url_for('main.search', category=cat.slug) }}" class="category-card">
+            <div class="category-icon-box">
+              <i class="fa-solid {{ cat.icon }}"></i>
+            </div>
+            <div>
+              <h5 class="category-title">{{ cat.name }}</h5>
+              <div class="category-subtitle">{{ cat.job_count }} Open Positions</div>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Featured & Recent Jobs Section -->
+<section class="py-5 bg-white border-top border-bottom">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="text-primary fw-bold text-uppercase small">Fresh Openings</span>
+        <h2 class="fw-bold text-dark mb-0">Featured Tech Jobs</h2>
+      </div>
+      <a href="{{ url_for('main.search') }}" class="btn btn-primary btn-sm">
+        Explore All Jobs <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for job in recent_jobs %}
+        <div class="col-lg-4 col-md-6">
+          <div class="job-card">
+            <div class="job-card-header">
+              <div class="company-logo-box">
+                {{ job.company.name[:1] }}
+              </div>
+              <div class="flex-grow-1">
+                <h5 class="job-card-title">
+                  <a href="{{ url_for('main.job_details', job_id=job.id) }}">{{ job.title }}</a>
+                </h5>
+                <div class="job-card-company">
+                  <i class="fa-solid fa-building me-1 text-muted"></i> {{ job.company.name }}
+                </div>
+              </div>
+              
+              <!-- Save Job Bookmark Button -->
+              <button class="btn btn-light btn-sm rounded-circle p-2 border btn-save-job" data-job-id="{{ job.id }}" title="Bookmark Job">
+                <i class="{% if job.id in saved_job_ids %}fas fa-bookmark text-danger{% else %}far fa-bookmark text-muted{% endif %}"></i>
+              </button>
+            </div>
+
+            <!-- Meta attributes -->
+            <div class="job-meta-list">
+              <span class="job-meta-item">
+                <i class="fa-solid fa-location-dot text-primary"></i> {{ job.location }}
+              </span>
+              <span class="job-meta-item">
+                <i class="fa-solid fa-briefcase text-secondary"></i> {{ job.experience_level }}
+              </span>
+              <span class="job-meta-item">
+                <i class="fa-solid fa-laptop-code text-info"></i> {{ job.work_mode }}
+              </span>
+            </div>
+
+            <div class="mb-3">
+              <span class="salary-badge">
+                <i class="fa-solid fa-indian-rupee-sign"></i> {{ job.formatted_salary }}
+              </span>
+              <span class="badge bg-light text-secondary border ms-1">{{ job.job_type }}</span>
+            </div>
+
+            <!-- Skills List -->
+            <div class="skill-tags-group">
+              {% for skill in job.skills_list[:4] %}
+                <span class="skill-tag">{{ skill }}</span>
+              {% endfor %}
+              {% if job.skills_list | length > 4 %}
+                <span class="skill-tag">+{{ (job.skills_list | length) - 4 }} more</span>
+              {% endif %}
+            </div>
+
+            <div class="job-card-footer">
+              <div>
+                <i class="fa-regular fa-clock me-1"></i> Posted {{ job.created_at | time_ago }}
+              </div>
+              <a href="{{ url_for('main.job_details', job_id=job.id) }}" class="btn btn-outline-primary btn-sm px-3 fw-semibold">
+                Apply Now <i class="fa-solid fa-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Top Hiring Companies -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold text-uppercase small">Top Employers</span>
+      <h2 class="fw-bold text-dark">Hiring at Scale on JobConnect</h2>
+      <p class="text-muted">India's leading unicorns, global GCCs, and innovators recruit via our platform.</p>
+    </div>
+
+    <div class="row g-4">
+      {% for company in top_companies %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <div class="kpi-card text-center p-4 h-100 d-flex flex-column justify-content-between">
+            <div>
+              <div class="company-logo-box mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem;">
+                {{ company.name[:1] }}
+              </div>
+              <h5 class="fw-bold text-dark mb-1">{{ company.name }}</h5>
+              <div class="text-muted small mb-2"><i class="fa-solid fa-location-dot me-1"></i> {{ company.location }}</div>
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-3">
+                {{ company.industry }}
+              </span>
+            </div>
+            <div>
+              <a href="{{ url_for('main.company_profile', company_id=company.id) }}" class="btn btn-light btn-sm border w-100 fw-semibold">
+                View Openings ({{ company.jobs.filter_by(status='active').count() }})
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5 bg-white border-top">
+  <div class="container">
+    <div class="text-center mb-5">
+      <span class="text-primary fw-bold text-uppercase small">Streamlined Workflow</span>
+      <h2 class="fw-bold text-dark">How JobConnect Works</h2>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="text-center p-4 border rounded-4 bg-light h-100">
+          <div class="brand-icon mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem;">
+            1
+          </div>
+          <h5 class="fw-bold text-dark">Create Your Profile & Upload Resume</h5>
+          <p class="text-muted small">
+            Sign up in 30 seconds, add your core tech stack, GitHub/LinkedIn links, and upload your PDF resume with instant parsing.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="text-center p-4 border rounded-4 bg-light h-100">
+          <div class="brand-icon mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem; background: linear-gradient(135deg, #10b981, #059669);">
+            2
+          </div>
+          <h5 class="fw-bold text-dark">Explore & One-Click Apply</h5>
+          <p class="text-muted small">
+            Filter jobs by CTC, location, experience, and remote mode. Apply with your saved resume and personalized pitch in seconds.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="text-center p-4 border rounded-4 bg-light h-100">
+          <div class="brand-icon mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.5rem; background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+            3
+          </div>
+          <h5 class="fw-bold text-dark">Track Status & Get Hired</h5>
+          <p class="text-muted small">
+            Receive live updates as your application progresses from Review to Shortlisted and Interview Scheduled.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="py-5" style="background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);">
+  <div class="container text-center text-white py-4">
+    <h2 class="fw-bold mb-3">Accelerate Your Next Career Milestone Today</h2>
+    <p class="text-light opacity-75 max-w-600 mx-auto mb-4" style="max-width: 650px;">
+      Join thousands of top Indian software engineers, data scientists, and analysts who have landed rewarding roles through JobConnect.
+    </p>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
+      <a href="{{ url_for('auth.register', role='job_seeker') }}" class="btn btn-primary px-4 py-3 fw-bold">
+        <i class="fa-solid fa-user-plus me-2"></i> Register as Job Seeker
+      </a>
+      <a href="{{ url_for('auth.register', role='employer') }}" class="btn btn-outline-light px-4 py-3 fw-bold">
+        <i class="fa-solid fa-building me-2"></i> Post Openings as Employer
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

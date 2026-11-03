@@ -1,0 +1,53 @@
+# ==========================================
+# JobConnect Git Ignore Configuration
+# ==========================================
+
+# Environment variables & secrets (NEVER COMMIT)
+.env
+.env.*
+!.env.example
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Python compiled bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+jobconnect.db
+instance/
+
+# Local upload user files (keep sample PDF only)
+static/uploads/resumes/*
+!static/uploads/resumes/sample_aarav_sharma_resume.pdf
+
+# Logs and runtime artifacts
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor & OS files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.docx
+to run this code.txt

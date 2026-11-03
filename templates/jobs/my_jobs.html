@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Job Postings – JobConnect{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="d-flex align-items-center gap-3 p-2 mb-3 border-bottom border-secondary">
+      <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 44px; height: 44px;">
+        {{ current_user.display_name[:1] }}
+      </div>
+      <div class="overflow-hidden">
+        <h6 class="fw-bold text-white mb-0 text-truncate">{{ current_user.display_name }}</h6>
+        <div class="text-secondary small text-truncate">Recruiter</div>
+      </div>
+    </div>
+
+    <div class="sidebar-heading">Recruitment Hub</div>
+    <ul class="sidebar-menu">
+      <li class="sidebar-item"><a href="{{ url_for('employer.dashboard') }}"><i class="fa-solid fa-gauge"></i> Overview</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('employer.post_job') }}"><i class="fa-solid fa-plus-circle"></i> Post a Job</a></li>
+      <li class="sidebar-item active"><a href="{{ url_for('employer.my_jobs') }}"><i class="fa-solid fa-briefcase"></i> My Job Listings ({{ jobs | length }})</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('employer.all_applicants') }}"><i class="fa-solid fa-users"></i> Applicants</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('employer.company_profile') }}"><i class="fa-solid fa-building"></i> Company Profile</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">My Posted Job Openings</h3>
+        <p class="text-muted small mb-0">Manage live job vacancies, review applicant counts, and edit details.</p>
+      </div>
+      <a href="{{ url_for('employer.post_job') }}" class="btn btn-primary btn-sm px-4 fw-bold">
+        <i class="fa-solid fa-plus me-1"></i> Post New Job Opening
+      </a>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      {% if jobs %}
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Job Title & Domain</th>
+                <th>Location & Mode</th>
+                <th>Salary (INR)</th>
+                <th>Applicants</th>
+                <th>Status</th>
+                <th>Posted Date</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for job in jobs %}
+                <tr>
+                  <td>
+                    <div class="fw-bold text-dark">
+                      <a href="{{ url_for('main.job_details', job_id=job.id) }}" class="text-dark">{{ job.title }}</a>
+                    </div>
+                    <div class="text-muted small">{{ job.category.name if job.category else 'General' }} • {{ job.job_type }}</div>
+                  </td>
+                  <td>
+                    <div class="small fw-semibold">{{ job.location }}</div>
+                    <div class="badge bg-light text-secondary border" style="font-size: 0.72rem;">{{ job.work_mode }}</div>
+                  </td>
+                  <td>
+                    <span class="salary-badge" style="font-size: 0.78rem;">{{ job.formatted_salary }}</span>
+                  </td>
+                  <td>
+                    <a href="{{ url_for('employer.view_applicants', job_id=job.id) }}" class="badge bg-primary-subtle text-primary border border-primary-subtle p-2 text-decoration-none">
+                      <i class="fa-solid fa-users me-1"></i> {{ job.applications_count }} Candidates
+                    </a>
+                  </td>
+                  <td>
+                    <span class="badge {% if job.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
+                      {{ job.status.title() }}
+                    </span>
+                  </td>
+                  <td class="small text-muted">{{ job.created_at | format_date }}</td>
+                  <td class="text-end">
+                    <div class="d-inline-flex gap-1">
+                      <!-- View Candidates -->
+                      <a href="{{ url_for('employer.view_applicants', job_id=job.id) }}" class="btn btn-light btn-sm border" title="Review Candidates">
+                        <i class="fa-solid fa-users text-primary"></i>
+                      </a>
+                      <!-- Edit Job -->
+                      <a href="{{ url_for('employer.edit_job', job_id=job.id) }}" class="btn btn-light btn-sm border" title="Edit Opening">
+                        <i class="fa-solid fa-pen-to-square text-secondary"></i>
+                      </a>
+                      <!-- Toggle Status -->
+                      <form action="{{ url_for('employer.toggle_status', job_id=job.id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-light btn-sm border" title="Toggle Active / Closed">
+                          <i class="fa-solid {% if job.status == 'active' %}fa-pause text-warning{% else %}fa-play text-success{% endif %}"></i>
+                        </button>
+                      </form>
+                      <!-- Delete Job -->
+                      <form action="{{ url_for('employer.delete_job', job_id=job.id) }}" method="POST" onsubmit="return confirm('Permanently delete this job opening? All candidate applications will also be removed.');" class="d-inline">
+                        <button type="submit" class="btn btn-light btn-sm border text-danger" title="Delete Opening">
+                          <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center p-5 text-muted">
+          <i class="fa-solid fa-briefcase fs-1 text-secondary mb-3"></i>
+          <h5>No Job Openings Yet</h5>
+          <p class="small text-muted">You haven't posted any jobs yet. Create your first listing to start hiring!</p>
+          <a href="{{ url_for('employer.post_job') }}" class="btn btn-primary btn-sm px-4">Post a Job</a>
+        </div>
+      {% endif %}
+    </div>
+
+  </main>
+</div>
+{% endblock %}

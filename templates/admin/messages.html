@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Inquiries – Admin Console{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  
+  <aside class="dashboard-sidebar">
+    <div class="d-flex align-items-center gap-3 p-2 mb-3 border-bottom border-secondary">
+      <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 44px; height: 44px;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div class="overflow-hidden">
+        <h6 class="fw-bold text-white mb-0 text-truncate">Administrator</h6>
+        <div class="text-secondary small text-truncate">Super Admin</div>
+      </div>
+    </div>
+
+    <div class="sidebar-heading">Admin Management</div>
+    <ul class="sidebar-menu">
+      <li class="sidebar-item"><a href="{{ url_for('admin.dashboard') }}"><i class="fa-solid fa-gauge-high"></i> Overview</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('admin.manage_users') }}"><i class="fa-solid fa-users-gear"></i> Users</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('admin.manage_jobs') }}"><i class="fa-solid fa-list-check"></i> Job Listings</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('admin.manage_categories') }}"><i class="fa-solid fa-tags"></i> Categories</a></li>
+      <li class="sidebar-item active"><a href="{{ url_for('admin.messages') }}"><i class="fa-solid fa-envelope-open-text"></i> Messages ({{ messages | length }})</a></li>
+    </ul>
+  </aside>
+
+  <main class="dashboard-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">Contact Inquiries</h3>
+        <p class="text-muted small mb-0">Review communications and support tickets sent via the public contact portal.</p>
+      </div>
+    </div>
+
+    {% if messages %}
+      <div class="d-flex flex-column gap-3">
+        {% for msg in messages %}
+          <div class="card border-0 shadow-sm rounded-4 p-4 {% if not msg.is_resolved %}border-start border-4 border-warning{% endif %}">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-2">
+              <div>
+                <h5 class="fw-bold text-dark mb-0">{{ msg.subject }}</h5>
+                <div class="text-muted small">
+                  From: <strong>{{ msg.name }}</strong> ({{ msg.email }}) • {{ msg.created_at | format_date }}
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge {% if msg.is_resolved %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                  {% if msg.is_resolved %}Resolved{% else %}Pending{% endif %}
+                </span>
+                <form action="{{ url_for('admin.toggle_message_resolve', msg_id=msg.id) }}" method="POST">
+                  <button type="submit" class="btn btn-sm btn-light border">
+                    {% if msg.is_resolved %}Reopen{% else %}Mark Resolved{% endif %}
+                  </button>
+                </form>
+              </div>
+            </div>
+            <div class="p-3 bg-light rounded-3 text-secondary small" style="white-space: pre-line;">
+              {{ msg.message }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card border-0 shadow-sm rounded-4 p-5 text-center text-muted">
+        <i class="fa-solid fa-envelope-circle-check fs-1 text-secondary mb-3"></i>
+        <h5>All Inquiries Resolved</h5>
+        <p class="small text-muted">No pending messages in the queue.</p>
+      </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}

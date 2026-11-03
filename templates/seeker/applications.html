@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}My Applications – JobConnect{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="d-flex align-items-center gap-3 p-2 mb-3 border-bottom border-secondary">
+      <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 44px; height: 44px;">
+        {{ current_user.display_name[:1] }}
+      </div>
+      <div class="overflow-hidden">
+        <h6 class="fw-bold text-white mb-0 text-truncate">{{ current_user.display_name }}</h6>
+        <div class="text-secondary small text-truncate">Job Seeker</div>
+      </div>
+    </div>
+
+    <div class="sidebar-heading">Navigation</div>
+    <ul class="sidebar-menu">
+      <li class="sidebar-item"><a href="{{ url_for('seeker.dashboard') }}"><i class="fa-solid fa-gauge"></i> Overview</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('seeker.profile') }}"><i class="fa-regular fa-user"></i> My Profile</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('seeker.resume_manager') }}"><i class="fa-solid fa-file-pdf"></i> Manage Resumes</a></li>
+      <li class="sidebar-item active"><a href="{{ url_for('seeker.applications') }}"><i class="fa-solid fa-paper-plane"></i> Applications ({{ applications | length }})</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('seeker.saved_jobs') }}"><i class="fa-regular fa-bookmark"></i> Saved Jobs</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">My Job Applications</h3>
+        <p class="text-muted small mb-0">Track real-time hiring stages, recruiter feedback, and status transitions.</p>
+      </div>
+      <div>
+        <a href="{{ url_for('main.search') }}" class="btn btn-primary btn-sm px-3 fw-bold">
+          <i class="fa-solid fa-magnifying-glass me-1"></i> Apply to New Jobs
+        </a>
+      </div>
+    </div>
+
+    <!-- Filter Pills -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+      <a href="{{ url_for('seeker.applications') }}" class="btn btn-sm {% if not current_filter %}btn-primary{% else %}btn-light border{% endif %}">
+        All Applications
+      </a>
+      <a href="{{ url_for('seeker.applications', status='applied') }}" class="btn btn-sm {% if current_filter == 'applied' %}btn-primary{% else %}btn-light border{% endif %}">
+        Applied
+      </a>
+      <a href="{{ url_for('seeker.applications', status='under_review') }}" class="btn btn-sm {% if current_filter == 'under_review' %}btn-primary{% else %}btn-light border{% endif %}">
+        Under Review
+      </a>
+      <a href="{{ url_for('seeker.applications', status='shortlisted') }}" class="btn btn-sm {% if current_filter == 'shortlisted' %}btn-primary{% else %}btn-light border{% endif %}">
+        Shortlisted
+      </a>
+      <a href="{{ url_for('seeker.applications', status='interview') }}" class="btn btn-sm {% if current_filter == 'interview' %}btn-primary{% else %}btn-light border{% endif %}">
+        Interview Scheduled
+      </a>
+      <a href="{{ url_for('seeker.applications', status='accepted') }}" class="btn btn-sm {% if current_filter == 'accepted' %}btn-primary{% else %}btn-light border{% endif %}">
+        Offered
+      </a>
+      <a href="{{ url_for('seeker.applications', status='rejected') }}" class="btn btn-sm {% if current_filter == 'rejected' %}btn-primary{% else %}btn-light border{% endif %}">
+        Rejected
+      </a>
+    </div>
+
+    <!-- Applications Table Card -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      {% if applications %}
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Job & Company</th>
+                <th>Offered CTC</th>
+                <th>Applied On</th>
+                <th>Resume</th>
+                <th>Stage & Feedback</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for app in applications %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="company-logo-box" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                        {{ app.job.company.name[:1] }}
+                      </div>
+                      <div>
+                        <h6 class="fw-bold mb-0">
+                          <a href="{{ url_for('main.job_details', job_id=app.job.id) }}" class="text-dark">{{ app.job.title }}</a>
+                        </h6>
+                        <div class="text-muted small">{{ app.job.company.name }} • {{ app.job.location }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="salary-badge" style="font-size: 0.8rem;">{{ app.job.formatted_salary }}</span>
+                  </td>
+                  <td class="small text-muted">{{ app.applied_at | format_date }}</td>
+                  <td>
+                    {% if app.resume %}
+                      <a href="{{ url_for('seeker.download_resume', resume_id=app.resume.id) }}" class="small text-primary text-decoration-none">
+                        <i class="fa-solid fa-file-pdf text-danger me-1"></i> Attached
+                      </a>
+                    {% else %}
+                      <span class="small text-muted">Direct</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="badge {{ app.status_badge_class }} mb-1">{{ app.status_label }}</span>
+                    {% if app.recruiter_notes %}
+                      <div class="small text-muted mt-1 p-2 bg-light rounded-2 border" style="max-width: 260px; font-size: 0.78rem;">
+                        <i class="fa-solid fa-comment-dots text-primary me-1"></i> "{{ app.recruiter_notes }}"
+                      </div>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <div class="d-inline-flex gap-2">
+                      <a href="{{ url_for('main.job_details', job_id=app.job.id) }}" class="btn btn-light btn-sm border" title="View Job Details">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                      </a>
+                      <form action="{{ url_for('seeker.withdraw_application', app_id=app.id) }}" method="POST" onsubmit="return confirm('Withdraw this application? You will need to re-apply if you change your mind.');">
+                        <button type="submit" class="btn btn-light btn-sm border text-danger" title="Withdraw Application">
+                          <i class="fa-solid fa-xmark"></i>
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center p-5 text-muted">
+          <i class="fa-solid fa-paper-plane fs-1 text-secondary mb-3"></i>
+          <h5>No Applications Found</h5>
+          <p class="small text-muted">No applications match your selected stage.</p>
+          <a href="{{ url_for('main.search') }}" class="btn btn-primary btn-sm px-4">Browse Jobs Now</a>
+        </div>
+      {% endif %}
+    </div>
+
+  </main>
+</div>
+{% endblock %}

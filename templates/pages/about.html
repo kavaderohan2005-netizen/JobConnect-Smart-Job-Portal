@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}About Us – JobConnect Smart Job Portal{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="bg-dark text-white py-5 text-center">
+  <div class="container py-4">
+    <div class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill mb-3 fw-semibold">
+      Empowering India's Tech Ecosystem
+    </div>
+    <h1 class="fw-bold display-5 mb-3">Connecting Visionary Companies with World-Class Engineers</h1>
+    <p class="text-secondary max-w-600 mx-auto fs-5" style="max-width: 650px;">
+      JobConnect was founded with a single mission: to eliminate friction from tech recruitment in India by matching skills directly to impactful roles.
+    </p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <!-- Metrics -->
+  <div class="row g-4 text-center mb-5">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <h2 class="fw-bold text-primary display-5 mb-1">{{ total_jobs }}+</h2>
+        <h6 class="fw-bold text-dark">Active Tech Roles</h6>
+        <p class="text-muted small mb-0">From early-stage AI seed startups to Fortune 500 GCC centers.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <h2 class="fw-bold text-success display-5 mb-1">{{ total_companies }}+</h2>
+        <h6 class="fw-bold text-dark">Verified Enterprises</h6>
+        <p class="text-muted small mb-0">Committed to transparent salary bands and fast recruitment SLAs.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <h2 class="fw-bold text-purple display-5 mb-1">{{ total_seekers }}+</h2>
+        <h6 class="fw-bold text-dark">Pre-Screened Candidates</h6>
+        <p class="text-muted small mb-0">Specialized in Data Science, ML, Backend, and Distributed Systems.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mission & Values -->
+  <div class="row g-5 align-items-center mb-5">
+    <div class="col-lg-6">
+      <span class="text-primary fw-bold text-uppercase small">Our Philosophy</span>
+      <h2 class="fw-bold text-dark mb-3">Why JobConnect is Different</h2>
+      <p class="text-secondary" style="line-height: 1.8;">
+        Traditional job boards are flooded with outdated posts, ghost recruiters, and endless forms that vanish into black holes. 
+      </p>
+      <p class="text-secondary" style="line-height: 1.8;">
+        JobConnect introduces direct transparency: verified salary disclosures in LPA, structured candidate profiles, in-browser PDF resume reviews, and live hiring stage trackers that keep both engineers and talent partners in complete sync.
+      </p>
+      
+      <div class="d-flex flex-column gap-3 mt-4">
+        <div class="d-flex align-items-start gap-3">
+          <div class="bg-primary-subtle text-primary p-2 rounded-3 fs-5"><i class="fa-solid fa-bolt"></i></div>
+          <div>
+            <h6 class="fw-bold mb-1">Instant Skills Matching</h6>
+            <p class="text-muted small mb-0">Algorithms that score candidate portfolios directly against employer tech requirements.</p>
+          </div>
+        </div>
+        <div class="d-flex align-items-start gap-3">
+          <div class="bg-success-subtle text-success p-2 rounded-3 fs-5"><i class="fa-solid fa-eye"></i></div>
+          <div>
+            <h6 class="fw-bold mb-1">Zero Salary Ambiguity</h6>
+            <p class="text-muted small mb-0">All premium openings specify realistic compensation benchmarks in INR.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="p-5 bg-light rounded-4 border text-center">
+        <div class="brand-icon mx-auto mb-4" style="width: 80px; height: 80px; font-size: 2.2rem;">
+          <i class="fa-solid fa-briefcase"></i>
+        </div>
+        <h4 class="fw-bold text-dark">Ready to Build Your Career?</h4>
+        <p class="text-muted small mb-4">Discover verified openings tailored to your exact tech stack and location preferences.</p>
+        <div class="d-flex justify-content-center gap-2">
+          <a href="{{ url_for('main.search') }}" class="btn btn-primary px-4 fw-bold">Explore Jobs</a>
+          <a href="{{ url_for('auth.register', role='job_seeker') }}" class="btn btn-outline-secondary px-4 fw-bold">Sign Up Free</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

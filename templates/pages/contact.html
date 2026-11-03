@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Support & Partnerships – JobConnect{% endblock %}
+
+{% block content %}
+<div class="bg-dark text-white py-5 text-center">
+  <div class="container py-3">
+    <h1 class="fw-bold mb-2">Get in Touch with JobConnect</h1>
+    <p class="text-secondary small max-w-600 mx-auto" style="max-width: 550px;">
+      Have a question regarding job applications, employer recruitment packages, or technical support? Our dedicated team is here to assist.
+    </p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-5">
+    
+    <!-- Contact Form -->
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+        <h4 class="fw-bold text-dark mb-1">Send Us a Direct Message</h4>
+        <p class="text-muted small mb-4">Fill out the form below and we'll reply within 24 business hours.</p>
+
+        <form action="{{ url_for('main.contact') }}" method="POST">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-secondary">Your Name <span class="text-danger">*</span></label>
+              <input type="text" name="name" class="form-control" placeholder="e.g. Ramesh Kumar" required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-bold text-secondary">Email Address <span class="text-danger">*</span></label>
+              <input type="email" name="email" class="form-control" placeholder="name@domain.com" required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label small fw-bold text-secondary">Inquiry Subject <span class="text-danger">*</span></label>
+              <input type="text" name="subject" class="form-control" placeholder="e.g. Enterprise Employer Partnership or Support Request" required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label small fw-bold text-secondary">Message Details <span class="text-danger">*</span></label>
+              <textarea name="message" class="form-control" rows="5" placeholder="Please provide specific details about your query..." required></textarea>
+            </div>
+
+            <div class="col-12 mt-3">
+              <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">
+                <i class="fa-solid fa-paper-plane me-1"></i> Send Inquiry
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Contact Info & Offices -->
+    <div class="col-lg-5">
+      <div class="d-flex flex-column gap-4">
+        
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+          <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-building text-primary me-2"></i>Headquarters</h5>
+          <p class="small text-secondary mb-3">
+            JobConnect Technologies India Pvt. Ltd.<br>
+            4th Floor, Tech Hub Tower, 100 Feet Road,<br>
+            Indiranagar, Bengaluru, Karnataka 560038
+          </p>
+          <div class="small text-muted d-flex flex-column gap-2">
+            <div><i class="fa-solid fa-phone text-primary me-2"></i> +91 80 4920 1200</div>
+            <div><i class="fa-solid fa-envelope text-primary me-2"></i> support@jobconnect.com</div>
+            <div><i class="fa-solid fa-clock text-primary me-2"></i> Mon - Fri: 9:00 AM - 6:30 PM IST</div>
+          </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-city text-success me-2"></i>Regional Innovation Hubs</h5>
+          <div class="small d-flex flex-column gap-2 text-secondary">
+            <div>
+              <strong>Hyderabad:</strong> HITEC City, Phase 2, Madhapur, Hyderabad 500081
+            </div>
+            <div>
+              <strong>Gurgaon / Delhi NCR:</strong> Cyber City, DLF Phase 2, Gurugram 122002
+            </div>
+            <div>
+              <strong>Pune:</strong> Magarpatta Cybercity, Hadapsar, Pune 411028
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FAQ Accordion -->
+  <div class="mt-5 pt-4">
+    <div class="text-center mb-4">
+      <span class="text-primary fw-bold text-uppercase small">Help Center</span>
+      <h3 class="fw-bold text-dark">Frequently Asked Questions</h3>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="accordion shadow-sm rounded-4 overflow-hidden border" id="faqAccordion">
+          
+          <div class="accordion-item border-0 border-bottom">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                Is JobConnect free for candidates?
+              </button>
+            </h2>
+            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-secondary small">
+                Yes, 100%! Job seekers can create profiles, upload resumes in PDF format, apply to unlimited openings, save jobs, and track their hiring pipeline completely free of charge.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 border-bottom">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                How do employers review and download applicant resumes?
+              </button>
+            </h2>
+            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-secondary small">
+                Employers have access to the Applicants Hub on their dashboard where each candidate's profile, contact information, match score, and uploaded PDF resume can be downloaded with 1 click.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                How does JobConnect integrate with MySQL database?
+              </button>
+            </h2>
+            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-secondary small">
+                JobConnect connects directly to standard MySQL 8.0+ server using PyMySQL and SQLAlchemy with full relational constraints and foreign keys. An automatic fallback engine also guarantees instant zero-config evaluation if local MySQL service is temporarily offline.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

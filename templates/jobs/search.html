@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Search Jobs – JobConnect Smart Job Portal{% endblock %}
+
+{% block content %}
+<div class="bg-light py-4 border-bottom">
+  <div class="container">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">Explore Tech Opportunities</h3>
+        <p class="text-muted small mb-0">Showing <strong>{{ total_results }}</strong> verified positions across India</p>
+      </div>
+
+      <!-- Quick Sorting Form -->
+      <form method="GET" action="{{ url_for('main.search') }}" id="sortForm" class="d-flex align-items-center gap-2">
+        <!-- Preserve other query params -->
+        <input type="hidden" name="q" value="{{ q }}">
+        <input type="hidden" name="location" value="{{ location }}">
+        <input type="hidden" name="category" value="{{ selected_category }}">
+        <input type="hidden" name="job_type" value="{{ job_type }}">
+        <input type="hidden" name="work_mode" value="{{ work_mode }}">
+        <input type="hidden" name="experience" value="{{ experience }}">
+        <input type="hidden" name="min_salary" value="{{ min_salary }}">
+
+        <span class="small text-muted text-nowrap">Sort By:</span>
+        <select name="sort" class="form-select form-select-sm bg-white border" onchange="document.getElementById('sortForm').submit();" style="width: 180px;">
+          <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+          <option value="salary_high" {% if sort_by == 'salary_high' %}selected{% endif %}>Salary: High to Low</option>
+          <option value="salary_low" {% if sort_by == 'salary_low' %}selected{% endif %}>Salary: Low to High</option>
+          <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest First</option>
+        </select>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row g-4">
+    
+    <!-- Left Filter Sidebar -->
+    <div class="col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 85px;">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-sliders text-primary me-2"></i>Filters</h5>
+          <a href="{{ url_for('main.search') }}" class="small text-danger text-decoration-none fw-semibold">Reset All</a>
+        </div>
+
+        <form action="{{ url_for('main.search') }}" method="GET" id="filterForm">
+          <input type="hidden" name="sort" value="{{ sort_by }}">
+
+          <!-- Keyword Search -->
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-secondary">Keyword / Skill</label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-light"><i class="fa-solid fa-magnifying-glass"></i></span>
+              <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="e.g. Python, ML">
+            </div>
+          </div>
+
+          <!-- Location -->
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-secondary">Location</label>
+            <select name="location" class="form-select form-select-sm">
+              <option value="">All Locations</option>
+              {% for loc in locations %}
+                <option value="{{ loc }}" {% if location == loc %}selected{% endif %}>{{ loc }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Categories -->
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-secondary">Category</label>
+            <select name="category" class="form-select form-select-sm">
+              <option value="">All Categories</option>
+              {% for cat in categories %}
+                <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Work Mode -->
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-secondary">Work Mode</label>
+            <div class="d-flex flex-column gap-1">
+              {% for mode in ['Remote', 'Hybrid', 'Onsite'] %}
+                <div class="form-check small">
+                  <input class="form-check-input" type="radio" name="work_mode" id="mode_{{ mode }}" value="{{ mode }}" {% if work_mode == mode %}checked{% endif %}>
+                  <label class="form-check-label" for="mode_{{ mode }}">{{ mode }}</label>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Experience Level -->
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-secondary">Experience Level</label>
+            <select name="experience" class="form-select form-select-sm">
+              <option value="">Any Experience</option>
+              <option value="Entry Level" {% if experience == 'Entry Level' %}selected{% endif %}>Entry Level (0-2 yrs)</option>
+              <option value="Mid Level" {% if experience == 'Mid Level' %}selected{% endif %}>Mid Level (3-5 yrs)</option>
+              <option value="Senior Level" {% if experience == 'Senior Level' %}selected{% endif %}>Senior Level (5-8 yrs)</option>
+              <option value="Lead" {% if experience == 'Lead' %}selected{% endif %}>Lead / Principal (8+ yrs)</option>
+            </select>
+          </div>
+
+          <!-- Minimum Salary Slider -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label small fw-bold text-secondary mb-0">Min Salary (CTC)</label>
+              <span class="small fw-bold text-primary" id="salaryValueDisplay">
+                {% if min_salary and min_salary > 0 %}₹{{ (min_salary / 100000) | round }} LPA+{% else %}Any Salary{% endif %}
+              </span>
+            </div>
+            <input type="range" class="form-range" min="0" max="4000000" step="200000" id="salaryRange" name="min_salary" value="{{ min_salary }}">
+            <div class="d-flex justify-content-between text-muted" style="font-size: 0.72rem;">
+              <span>0</span>
+              <span>15L</span>
+              <span>30L</span>
+              <span>40L+</span>
+            </div>
+          </div>
+
+          <!-- Submit Filters -->
+          <button type="submit" class="btn btn-primary btn-sm w-100 fw-bold py-2">
+            Apply Filters
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Results Section -->
+    <div class="col-lg-9">
+      {% if jobs %}
+        <div class="row g-4">
+          {% for job in jobs %}
+            <div class="col-md-6 col-lg-6">
+              <div class="job-card">
+                <div class="job-card-header">
+                  <div class="company-logo-box">
+                    {{ job.company.name[:1] }}
+                  </div>
+                  <div class="flex-grow-1">
+                    <h5 class="job-card-title">
+                      <a href="{{ url_for('main.job_details', job_id=job.id) }}">{{ job.title }}</a>
+                    </h5>
+                    <div class="job-card-company">
+                      <i class="fa-solid fa-building me-1 text-muted"></i> {{ job.company.name }}
+                    </div>
+                  </div>
+                  
+                  <button class="btn btn-light btn-sm rounded-circle p-2 border btn-save-job" data-job-id="{{ job.id }}" title="Bookmark Job">
+                    <i class="{% if job.id in saved_job_ids %}fas fa-bookmark text-danger{% else %}far fa-bookmark text-muted{% endif %}"></i>
+                  </button>
+                </div>
+
+                <div class="job-meta-list">
+                  <span class="job-meta-item"><i class="fa-solid fa-location-dot text-primary"></i> {{ job.location }}</span>
+                  <span class="job-meta-item"><i class="fa-solid fa-briefcase text-secondary"></i> {{ job.experience_level }}</span>
+                  <span class="job-meta-item"><i class="fa-solid fa-laptop-code text-info"></i> {{ job.work_mode }}</span>
+                </div>
+
+                <div class="mb-3">
+                  <span class="salary-badge">
+                    <i class="fa-solid fa-indian-rupee-sign"></i> {{ job.formatted_salary }}
+                  </span>
+                  <span class="badge bg-light text-secondary border ms-1">{{ job.job_type }}</span>
+                </div>
+
+                <!-- Skills -->
+                <div class="skill-tags-group">
+                  {% for skill in job.skills_list[:4] %}
+                    <span class="skill-tag">{{ skill }}</span>
+                  {% endfor %}
+                  {% if job.skills_list | length > 4 %}
+                    <span class="skill-tag">+{{ (job.skills_list | length) - 4 }}</span>
+                  {% endif %}
+                </div>
+
+                <div class="job-card-footer">
+                  <div>
+                    <i class="fa-regular fa-clock me-1"></i> {{ job.created_at | time_ago }}
+                  </div>
+                  <a href="{{ url_for('main.job_details', job_id=job.id) }}" class="btn btn-outline-primary btn-sm px-3 fw-semibold">
+                    View & Apply
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination.pages > 1 %}
+          <nav class="mt-5" aria-label="Job search results pages">
+            <ul class="pagination justify-content-center">
+              {% if pagination.has_prev %}
+                <li class="page-item">
+                  <a class="page-link" href="{{ url_for('main.search', page=pagination.prev_num, q=q, location=location, category=selected_category, job_type=job_type, work_mode=work_mode, experience=experience, min_salary=min_salary, sort=sort_by) }}">
+                    <i class="fa-solid fa-chevron-left"></i> Previous
+                  </a>
+                </li>
+              {% endif %}
+
+              {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                {% if p %}
+                  <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('main.search', page=p, q=q, location=location, category=selected_category, job_type=job_type, work_mode=work_mode, experience=experience, min_salary=min_salary, sort=sort_by) }}">
+                      {{ p }}
+                    </a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link">…</span></li>
+                {% endif %}
+              {% endfor %}
+
+              {% if pagination.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="{{ url_for('main.search', page=pagination.next_num, q=q, location=location, category=selected_category, job_type=job_type, work_mode=work_mode, experience=experience, min_salary=min_salary, sort=sort_by) }}">
+                    Next <i class="fa-solid fa-chevron-right"></i>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        {% endif %}
+
+      {% else %}
+        <!-- Empty State -->
+        <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
+          <div class="brand-icon mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem; background: var(--gray-100); color: var(--gray-500);">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <h4 class="fw-bold text-dark">No Jobs Match Your Exact Filters</h4>
+          <p class="text-muted small mx-auto" style="max-width: 480px;">
+            We couldn't find active positions matching your criteria. Try loosening your keywords, salary threshold, or location filter.
+          </p>
+          <div>
+            <a href="{{ url_for('main.search') }}" class="btn btn-primary btn-sm px-4">
+              Clear All Filters
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

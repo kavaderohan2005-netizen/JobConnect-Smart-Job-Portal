@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Saved Jobs – JobConnect{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="d-flex align-items-center gap-3 p-2 mb-3 border-bottom border-secondary">
+      <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 44px; height: 44px;">
+        {{ current_user.display_name[:1] }}
+      </div>
+      <div class="overflow-hidden">
+        <h6 class="fw-bold text-white mb-0 text-truncate">{{ current_user.display_name }}</h6>
+        <div class="text-secondary small text-truncate">Job Seeker</div>
+      </div>
+    </div>
+
+    <div class="sidebar-heading">Navigation</div>
+    <ul class="sidebar-menu">
+      <li class="sidebar-item"><a href="{{ url_for('seeker.dashboard') }}"><i class="fa-solid fa-gauge"></i> Overview</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('seeker.profile') }}"><i class="fa-regular fa-user"></i> My Profile</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('seeker.resume_manager') }}"><i class="fa-solid fa-file-pdf"></i> Manage Resumes</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('seeker.applications') }}"><i class="fa-solid fa-paper-plane"></i> Applications</a></li>
+      <li class="sidebar-item active"><a href="{{ url_for('seeker.saved_jobs') }}"><i class="fa-regular fa-bookmark"></i> Saved Jobs ({{ saved_items | length }})</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">Bookmarked Jobs</h3>
+        <p class="text-muted small mb-0">Saved positions you're planning to apply for.</p>
+      </div>
+      <a href="{{ url_for('main.search') }}" class="btn btn-outline-primary btn-sm">
+        <i class="fa-solid fa-magnifying-glass me-1"></i> Browse More
+      </a>
+    </div>
+
+    {% if saved_items %}
+      <div class="row g-4">
+        {% for item in saved_items %}
+          {% set job = item.job %}
+          <div class="col-md-6 col-lg-4">
+            <div class="job-card">
+              <div class="job-card-header">
+                <div class="company-logo-box">
+                  {{ job.company.name[:1] }}
+                </div>
+                <div class="flex-grow-1">
+                  <h5 class="job-card-title">
+                    <a href="{{ url_for('main.job_details', job_id=job.id) }}">{{ job.title }}</a>
+                  </h5>
+                  <div class="job-card-company">{{ job.company.name }}</div>
+                </div>
+                
+                <form action="{{ url_for('main.toggle_save_job', job_id=job.id) }}" method="POST">
+                  <button type="submit" class="btn btn-light btn-sm rounded-circle p-2 border text-danger" title="Remove Bookmark">
+                    <i class="fa-solid fa-bookmark"></i>
+                  </button>
+                </form>
+              </div>
+
+              <div class="job-meta-list">
+                <span class="job-meta-item"><i class="fa-solid fa-location-dot text-primary"></i> {{ job.location }}</span>
+                <span class="job-meta-item"><i class="fa-solid fa-briefcase text-secondary"></i> {{ job.experience_level }}</span>
+              </div>
+
+              <div class="mb-3">
+                <span class="salary-badge" style="font-size: 0.8rem;">
+                  <i class="fa-solid fa-indian-rupee-sign"></i> {{ job.formatted_salary }}
+                </span>
+                <span class="badge bg-light text-secondary border ms-1">{{ job.work_mode }}</span>
+              </div>
+
+              <div class="job-card-footer">
+                <div class="small text-muted">
+                  Saved {{ item.created_at | time_ago }}
+                </div>
+                <a href="{{ url_for('main.job_details', job_id=job.id) }}" class="btn btn-primary btn-sm px-3 fw-semibold">
+                  Apply Now
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
+        <div class="brand-icon mx-auto mb-3" style="width: 64px; height: 64px; font-size: 1.8rem; background: var(--gray-100); color: var(--gray-500);">
+          <i class="fa-regular fa-bookmark"></i>
+        </div>
+        <h4 class="fw-bold text-dark">No Saved Jobs Yet</h4>
+        <p class="text-muted small mx-auto" style="max-width: 450px;">
+          When browsing jobs, click the bookmark icon on any card to save it here for later review and application.
+        </p>
+        <div>
+          <a href="{{ url_for('main.search') }}" class="btn btn-primary btn-sm px-4">Browse Active Jobs</a>
+        </div>
+      </div>
+    {% endif %}
+
+  </main>
+</div>
+{% endblock %}

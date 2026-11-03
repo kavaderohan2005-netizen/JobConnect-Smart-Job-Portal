@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Command Center – JobConnect{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="d-flex align-items-center gap-3 p-2 mb-3 border-bottom border-secondary">
+      <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 44px; height: 44px;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div class="overflow-hidden">
+        <h6 class="fw-bold text-white mb-0 text-truncate">Administrator</h6>
+        <div class="text-secondary small text-truncate">Super Admin</div>
+      </div>
+    </div>
+
+    <div class="sidebar-heading">Admin Management</div>
+    <ul class="sidebar-menu">
+      <li class="sidebar-item active"><a href="{{ url_for('admin.dashboard') }}"><i class="fa-solid fa-gauge-high"></i> Overview</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('admin.manage_users') }}"><i class="fa-solid fa-users-gear"></i> Users ({{ total_users }})</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('admin.manage_jobs') }}"><i class="fa-solid fa-list-check"></i> Job Listings ({{ total_jobs }})</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('admin.manage_categories') }}"><i class="fa-solid fa-tags"></i> Categories</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('admin.messages') }}"><i class="fa-solid fa-envelope-open-text"></i> Messages ({{ pending_messages }})</a></li>
+    </ul>
+
+    <div class="sidebar-heading">Public Platform</div>
+    <ul class="sidebar-menu">
+      <li class="sidebar-item"><a href="{{ url_for('main.index') }}"><i class="fa-solid fa-house"></i> Portal Home</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('main.search') }}"><i class="fa-solid fa-magnifying-glass"></i> Search Jobs</a></li>
+    </ul>
+
+    <div class="mt-auto pt-4 border-top border-secondary">
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger btn-sm w-100">
+        <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Sign Out
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">Admin Command Center</h3>
+        <p class="text-muted small mb-0">Platform analytics, job moderation, user governance, and category hierarchy.</p>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="{{ url_for('admin.manage_jobs') }}" class="btn btn-primary btn-sm fw-bold">
+          <i class="fa-solid fa-list-check me-1"></i> Moderate Jobs
+        </a>
+      </div>
+    </div>
+
+    <!-- Platform KPI Metrics -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="kpi-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="kpi-label">Total Users</div>
+            <div class="kpi-icon-wrap bg-primary-subtle text-primary">
+              <i class="fa-solid fa-users"></i>
+            </div>
+          </div>
+          <div class="kpi-val text-primary">{{ total_users }}</div>
+          <div class="text-muted small">{{ total_seekers }} Seekers • {{ total_employers }} Recruiters</div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="kpi-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="kpi-label">Active Jobs</div>
+            <div class="kpi-icon-wrap bg-success-subtle text-success">
+              <i class="fa-solid fa-briefcase"></i>
+            </div>
+          </div>
+          <div class="kpi-val text-success">{{ active_jobs }}</div>
+          <div class="text-muted small">Total: {{ total_jobs }} jobs</div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="kpi-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="kpi-label">Applications</div>
+            <div class="kpi-icon-wrap bg-info-subtle text-info">
+              <i class="fa-solid fa-paper-plane"></i>
+            </div>
+          </div>
+          <div class="kpi-val text-info">{{ total_applications }}</div>
+          <div class="text-muted small">Platform submissions</div>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="kpi-card">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="kpi-label">Enterprises</div>
+            <div class="kpi-icon-wrap bg-purple-subtle text-purple">
+              <i class="fa-solid fa-building"></i>
+            </div>
+          </div>
+          <div class="kpi-val text-purple">{{ total_companies }}</div>
+          <div class="text-muted small">Registered companies</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart.js Visualizations Grid -->
+    <div class="row g-4 mb-4">
+      
+      <!-- Chart 1: Application Status Funnel -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+          <h5 class="fw-bold text-dark mb-3">Application Status Ratio</h5>
+          <div style="height: 250px; position: relative;">
+            <canvas id="adminStatusChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart 2: Category Distribution -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+          <h5 class="fw-bold text-dark mb-3">Jobs by Tech Category</h5>
+          <div style="height: 250px; position: relative;">
+            <canvas id="adminCategoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart 3: Monthly Trends -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+          <h5 class="fw-bold text-dark mb-3">6-Month Growth Trends</h5>
+          <div style="height: 250px; position: relative;">
+            <canvas id="adminTrendsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Management Tables: Recent Users & Recent Jobs -->
+    <div class="row g-4">
+      
+      <!-- Recent Users -->
+      <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-header bg-white border-bottom p-3 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-dark mb-0">Recent User Registrations</h5>
+            <a href="{{ url_for('admin.manage_users') }}" class="small fw-semibold text-primary">All Users</a>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for u in recent_users %}
+                    <tr>
+                      <td>
+                        <div class="fw-bold text-dark">{{ u.username }}</div>
+                        <div class="text-muted small">{{ u.email }}</div>
+                      </td>
+                      <td>
+                        <span class="badge bg-secondary-subtle text-dark border">{{ u.role.title() }}</span>
+                      </td>
+                      <td>
+                        <span class="badge {% if u.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                          {% if u.is_active %}Active{% else %}Banned{% endif %}
+                        </span>
+                      </td>
+                      <td class="text-end">
+                        <form action="{{ url_for('admin.toggle_user_status', user_id=u.id) }}" method="POST" class="d-inline">
+                          <button type="submit" class="btn btn-xs {% if u.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %} py-1 px-2" style="font-size: 0.75rem;">
+                            {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Job Postings -->
+      <div class="col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-header bg-white border-bottom p-3 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-dark mb-0">Recent Job Postings</h5>
+            <a href="{{ url_for('admin.manage_jobs') }}" class="small fw-semibold text-primary">All Jobs</a>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="custom-table">
+                <thead>
+                  <tr>
+                    <th>Job Title & Company</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for j in recent_jobs %}
+                    <tr>
+                      <td>
+                        <div class="fw-bold text-dark">{{ j.title }}</div>
+                        <div class="text-muted small">{{ j.company.name }}</div>
+                      </td>
+                      <td class="small">{{ j.location }}</td>
+                      <td>
+                        <span class="badge {% if j.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
+                          {{ j.status.title() }}
+                        </span>
+                      </td>
+                      <td class="text-end">
+                        <a href="{{ url_for('main.job_details', job_id=j.id) }}" class="btn btn-light btn-sm border" target="_blank">
+                          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // 1. Status Chart
+    const statusData = {{ status_map | tojson }};
+    initStatusChart('adminStatusChart', statusData);
+
+    // 2. Category Chart
+    const catStatsRaw = {{ cat_stats | tojson }};
+    const catLabels = catStatsRaw.map(item => item[0]);
+    const catCounts = catStatsRaw.map(item => item[1]);
+    initCategoryChart('adminCategoryChart', catLabels, catCounts);
+
+    // 3. Trends Chart
+    initTrendsChart('adminTrendsChart');
+  });
+</script>
+{% endblock %}

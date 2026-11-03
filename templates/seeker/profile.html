@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile – JobConnect{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  
+  <!-- Sidebar -->
+  <aside class="dashboard-sidebar">
+    <div class="d-flex align-items-center gap-3 p-2 mb-3 border-bottom border-secondary">
+      <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 44px; height: 44px;">
+        {{ seeker.full_name[:1] if seeker.full_name else 'U' }}
+      </div>
+      <div class="overflow-hidden">
+        <h6 class="fw-bold text-white mb-0 text-truncate">{{ seeker.full_name }}</h6>
+        <div class="text-secondary small text-truncate">Job Seeker</div>
+      </div>
+    </div>
+
+    <div class="sidebar-heading">Navigation</div>
+    <ul class="sidebar-menu">
+      <li class="sidebar-item"><a href="{{ url_for('seeker.dashboard') }}"><i class="fa-solid fa-gauge"></i> Overview</a></li>
+      <li class="sidebar-item active"><a href="{{ url_for('seeker.profile') }}"><i class="fa-regular fa-user"></i> My Profile</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('seeker.resume_manager') }}"><i class="fa-solid fa-file-pdf"></i> Manage Resumes</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('seeker.applications') }}"><i class="fa-solid fa-paper-plane"></i> Applications</a></li>
+      <li class="sidebar-item"><a href="{{ url_for('seeker.saved_jobs') }}"><i class="fa-regular fa-bookmark"></i> Saved Jobs</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="dashboard-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">Professional Profile</h3>
+        <p class="text-muted small mb-0">Craft your technical showcase to get noticed by top hiring teams.</p>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-primary fs-6 p-2 px-3">
+          Profile Strength: {{ seeker.profile_completion }}%
+        </span>
+      </div>
+    </div>
+
+    <!-- Basic Information Card -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+      <h5 class="fw-bold text-dark mb-4 border-bottom pb-2">
+        <i class="fa-solid fa-id-card text-primary me-2"></i>Personal & Contact Details
+      </h5>
+
+      <form method="POST" action="{{ url_for('seeker.profile') }}">
+        <input type="hidden" name="action" value="update_basic">
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-secondary">Full Name</label>
+            <input type="text" name="full_name" class="form-control" value="{{ seeker.full_name }}" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-secondary">Contact Phone</label>
+            <input type="text" name="phone" class="form-control" value="{{ seeker.phone or '' }}" placeholder="+91 98765 43210">
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label small fw-bold text-secondary">Professional Headline</label>
+            <input type="text" name="headline" class="form-control" value="{{ seeker.headline or '' }}" placeholder="e.g. Senior Machine Learning Engineer | PyTorch, MLOps, AWS">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-secondary">Location (City, State)</label>
+            <input type="text" name="location" class="form-control" value="{{ seeker.location or '' }}" placeholder="e.g. Bengaluru, Karnataka">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label small fw-bold text-secondary">Professional Summary & Bio</label>
+            <textarea name="bio" class="form-control" rows="3" placeholder="Brief summary of your background, architectural achievements, and technical passions...">{{ seeker.bio or '' }}</textarea>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-secondary">Total Experience (Years)</label>
+            <input type="number" step="0.5" name="experience_years" class="form-control" value="{{ seeker.experience_years or 0 }}">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-secondary">Current / Last Company</label>
+            <input type="text" name="current_company" class="form-control" value="{{ seeker.current_company or '' }}" placeholder="e.g. Infosys, TCS, Startup">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-secondary">Current CTC</label>
+            <input type="text" name="current_salary" class="form-control" value="{{ seeker.current_salary or '' }}" placeholder="e.g. ₹18 LPA">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-secondary">Expected CTC</label>
+            <input type="text" name="expected_salary" class="form-control" value="{{ seeker.expected_salary or '' }}" placeholder="e.g. ₹26 LPA">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-secondary">GitHub Profile URL</label>
+            <input type="url" name="github_url" class="form-control" value="{{ seeker.github_url or '' }}" placeholder="https://github.com/username">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-secondary">LinkedIn Profile URL</label>
+            <input type="url" name="linkedin_url" class="form-control" value="{{ seeker.linkedin_url or '' }}" placeholder="https://linkedin.com/in/username">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label small fw-bold text-secondary">Skills & Tech Stack (comma-separated)</label>
+            <input type="text" name="skills" class="form-control" value="{{ seeker.skills or '' }}" placeholder="Python, SQL, Machine Learning, PyTorch, Docker, FastApi">
+            <div class="form-text small">Enter skills separated by commas to match job requirements automatically.</div>
+          </div>
+
+          <div class="col-12 mt-4 text-end">
+            <button type="submit" class="btn btn-primary px-4 fw-bold">
+              <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Experience Section -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <h5 class="fw-bold text-dark mb-0">
+          <i class="fa-solid fa-briefcase text-primary me-2"></i>Work Experience
+        </h5>
+        <button class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="collapse" data-bs-target="#addExpForm">
+          <i class="fa-solid fa-plus me-1"></i> Add Experience
+        </button>
+      </div>
+
+      <!-- Add Experience Collapsible Form -->
+      <div class="collapse mb-4" id="addExpForm">
+        <div class="p-3 bg-light rounded-3 border">
+          <h6 class="fw-bold mb-3">Add Work Experience</h6>
+          <form method="POST" action="{{ url_for('seeker.profile') }}">
+            <input type="hidden" name="action" value="add_experience">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <input type="text" name="exp_title" class="form-control form-control-sm" placeholder="Job Title (e.g. Lead Data Scientist)" required>
+              </div>
+              <div class="col-md-6">
+                <input type="text" name="exp_company" class="form-control form-control-sm" placeholder="Company Name (e.g. Swiggy)" required>
+              </div>
+              <div class="col-md-6">
+                <input type="text" name="exp_duration" class="form-control form-control-sm" placeholder="Duration (e.g. 2022 - Present)">
+              </div>
+              <div class="col-12">
+                <textarea name="exp_description" class="form-control form-control-sm" rows="2" placeholder="Responsibilities and achievements..."></textarea>
+              </div>
+              <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary btn-sm fw-bold">Save Experience</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Experience List -->
+      {% if seeker.parsed_experience %}
+        <div class="d-flex flex-column gap-3">
+          {% for exp in seeker.parsed_experience %}
+            <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="fw-bold text-dark mb-1">{{ exp.title }}</h6>
+                <div class="text-primary small fw-semibold mb-1">{{ exp.company }} • {{ exp.duration }}</div>
+                <p class="text-muted small mb-0">{{ exp.description }}</p>
+              </div>
+              <form method="POST" action="{{ url_for('seeker.profile') }}" onsubmit="return confirm('Delete this experience?');">
+                <input type="hidden" name="action" value="delete_experience">
+                <input type="hidden" name="item_index" value="{{ loop.index0 }}">
+                <button type="submit" class="btn btn-link text-danger p-0 ms-2" title="Delete Entry">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </form>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted small mb-0">No work experience listed yet. Click "Add Experience" to add one.</p>
+      {% endif %}
+    </div>
+
+    <!-- Education Section -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <h5 class="fw-bold text-dark mb-0">
+          <i class="fa-solid fa-graduation-cap text-primary me-2"></i>Education
+        </h5>
+        <button class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="collapse" data-bs-target="#addEduForm">
+          <i class="fa-solid fa-plus me-1"></i> Add Education
+        </button>
+      </div>
+
+      <!-- Add Education Form -->
+      <div class="collapse mb-4" id="addEduForm">
+        <div class="p-3 bg-light rounded-3 border">
+          <h6 class="fw-bold mb-3">Add Education</h6>
+          <form method="POST" action="{{ url_for('seeker.profile') }}">
+            <input type="hidden" name="action" value="add_education">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <input type="text" name="edu_degree" class="form-control form-control-sm" placeholder="Degree (e.g. B.Tech in Computer Science)" required>
+              </div>
+              <div class="col-md-6">
+                <input type="text" name="edu_institution" class="form-control form-control-sm" placeholder="College / University" required>
+              </div>
+              <div class="col-md-6">
+                <input type="text" name="edu_year" class="form-control form-control-sm" placeholder="Year of Passing (e.g. 2022)">
+              </div>
+              <div class="col-md-6">
+                <input type="text" name="edu_score" class="form-control form-control-sm" placeholder="Score / CGPA (e.g. 8.8 CGPA)">
+              </div>
+              <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary btn-sm fw-bold">Save Education</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Education List -->
+      {% if seeker.parsed_education %}
+        <div class="d-flex flex-column gap-3">
+          {% for edu in seeker.parsed_education %}
+            <div class="p-3 border rounded-3 bg-light d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="fw-bold text-dark mb-1">{{ edu.degree }}</h6>
+                <div class="text-secondary small">{{ edu.institution }} • {{ edu.year }} {% if edu.score %}• <strong>{{ edu.score }}</strong>{% endif %}</div>
+              </div>
+              <form method="POST" action="{{ url_for('seeker.profile') }}" onsubmit="return confirm('Delete this education?');">
+                <input type="hidden" name="action" value="delete_education">
+                <input type="hidden" name="item_index" value="{{ loop.index0 }}">
+                <button type="submit" class="btn btn-link text-danger p-0 ms-2" title="Delete Entry">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </form>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted small mb-0">No education entries listed yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Technical Projects Section -->
+    <div class="card border-0 shadow-sm rounded-4 p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+        <h5 class="fw-bold text-dark mb-0">
+          <i class="fa-solid fa-code-fork text-primary me-2"></i>Featured Projects
+        </h5>
+        <button class="btn btn-outline-primary btn-sm fw-semibold" data-bs-toggle="collapse" data-bs-target="#addProjForm">
+          <i class="fa-solid fa-plus me-1"></i> Add Project
+        </button>
+      </div>
+
+      <!-- Add Project Form -->
+      <div class="collapse mb-4" id="addProjForm">
+        <div class="p-3 bg-light rounded-3 border">
+          <h6 class="fw-bold mb-3">Add Project</h6>
+          <form method="POST" action="{{ url_for('seeker.profile') }}">
+            <input type="hidden" name="action" value="add_project">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <input type="text" name="proj_title" class="form-control form-control-sm" placeholder="Project Title" required>
+              </div>
+              <div class="col-md-6">
+                <input type="text" name="proj_tech" class="form-control form-control-sm" placeholder="Technologies Used (e.g. Python, FastApi, PyTorch)">
+              </div>
+              <div class="col-12">
+                <input type="url" name="proj_link" class="form-control form-control-sm" placeholder="Live Demo or GitHub Repo URL">
+              </div>
+              <div class="col-12">
+                <textarea name="proj_summary" class="form-control form-control-sm" rows="2" placeholder="Brief project summary and impact..."></textarea>
+              </div>
+              <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary btn-sm fw-bold">Save Project</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Project List -->
+      {% if seeker.parsed_projects %}
+        <div class="row g-3">
+          {% for proj in seeker.parsed_projects %}
+            <div class="col-md-6">
+              <div class="p-3 border rounded-3 bg-light h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="d-flex justify-content-between align-items-start">
+                    <h6 class="fw-bold text-dark mb-1">{{ proj.title }}</h6>
+                    <form method="POST" action="{{ url_for('seeker.profile') }}" onsubmit="return confirm('Delete this project?');">
+                      <input type="hidden" name="action" value="delete_project">
+                      <input type="hidden" name="item_index" value="{{ loop.index0 }}">
+                      <button type="submit" class="btn btn-link text-danger p-0 ms-2" title="Delete Entry">
+                        <i class="fa-solid fa-trash-can"></i>
+                      </button>
+                    </form>
+                  </div>
+                  <div class="badge bg-secondary-subtle text-dark border mb-2 small">{{ proj.tech }}</div>
+                  <p class="text-muted small mb-2">{{ proj.summary }}</p>
+                </div>
+                {% if proj.link %}
+                  <div>
+                    <a href="{{ proj.link }}" target="_blank" rel="noopener" class="small fw-semibold text-primary">
+                      <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> View Repository
+                    </a>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted small mb-0">No technical projects listed yet.</p>
+      {% endif %}
+    </div>
+
+  </main>
+</div>
+{% endblock %}
